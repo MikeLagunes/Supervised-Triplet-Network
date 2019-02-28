@@ -1,0 +1,24 @@
+{
+  "tless":
+  {
+    "data_path": "/media/alexa/DATA/Datasets/tless/train_only_hard"
+  },
+
+  "core50":
+  {
+    "data_path": "/media/alexa/DATA/Datasets/core50"
+  },
+    "mnist":
+  {
+    "data_path": "/media/alexa/DATA/Datasets/mnist"
+  },
+    "arc":
+  {
+    "data_path": "/media/alexa/DATA/Datasets/arc"
+  },
+    "toybox":
+  {
+    "data_path": "/media/alexa/DATA/Datasets/toybox"
+  }
+
+}
