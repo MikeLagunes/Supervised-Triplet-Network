@@ -33,7 +33,7 @@ The model accuracy of the model is calculated every number of epochs, defined in
 evaluate the accuary of the model by running the next line:
 
 ```
-python test/test_embeddings.py
+python test/test_model.py
 ```
 
 We also provide the file for visualizing the emddings into a two-dimensionality representation using t-SNE. Simply indicate the location of
