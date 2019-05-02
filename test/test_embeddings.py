@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import random
 
 import sys, os
+sys.path.append('models')
 sys.path.append('.')
 sys.path.append('..')
 

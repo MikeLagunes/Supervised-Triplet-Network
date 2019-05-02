@@ -3,8 +3,9 @@ import torch
 import argparse
 
 import sys, os
-sys.path.append('.')
-sys.path.append('..')
+#sys.path.append('.')
+sys.path.append('models')
+#sys.path.append('..')
 
 from torch.autograd import Variable
 from torch.utils import data
@@ -40,8 +41,6 @@ def train(args):
     # Setup Model
     model = triplet_resnet50_softmax(pretrained=True,  num_classes=n_classes)
     model.cuda()
-
-
 
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=1e-4)#, weight_decay=1e-5
 

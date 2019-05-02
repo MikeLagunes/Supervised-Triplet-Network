@@ -85,7 +85,7 @@ def get_instances(args):
     #gt_file = '../loader/dataset_splits.yml' #../ for local
 
     with open(gt_file, 'r') as f:
-        doc = yaml.load(f)
+        doc = yaml.load(f, Loader=yaml.FullLoader)
 
     instances = doc[args.dataset][args.instances]
 
