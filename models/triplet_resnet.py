@@ -108,7 +108,8 @@ class Triplet_ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(512 * block.expansion, 1000)
+        self.fc_embedding = nn.Linear(512 * block.expansion, 1000)
 
 
         for m in self.modules():
@@ -148,7 +149,11 @@ class Triplet_ResNet(nn.Module):
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
-        x_embedding = self.fc(x)
+
+        x = self.fc(x)
+        x = self.relu(x)
+
+        x_embedding = self.fc_embedding(x)
 
         return x_embedding
 
@@ -170,11 +175,14 @@ def triplet_resnet50(pretrained=False,  num_classes=1000, **kwargs):
     """
     model = Triplet_ResNet(Bottleneck, [3, 4, 6, 3], num_classes=1000, **kwargs)
 
-    weights = model_zoo.load_url(model_urls['resnet50'])
+    weights_imagenet = model_zoo.load_url(model_urls['resnet50'])
+    weights_imagenet["fc_embedding.weight"] = weights_imagenet["fc.weight"]
+    weights_imagenet["fc_embedding.bias"] = weights_imagenet["fc.bias"]
 
     if pretrained:
-        model.load_state_dict(weights)
+        model.load_state_dict(weights_imagenet)
 
-    model.fc = nn.Linear(2048, 128)
+    model.fc = nn.Linear(2048, 1000)
+    model.fc_embedding = nn.Linear(1000, num_classes)
 
     return model

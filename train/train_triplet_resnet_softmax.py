@@ -3,9 +3,7 @@ import torch
 import argparse
 
 import sys, os
-#sys.path.append('.')
 sys.path.append('models')
-#sys.path.append('..')
 
 from torch.autograd import Variable
 from torch.utils import data
@@ -85,7 +83,6 @@ def train(args):
             labels_neg = Variable(labels_neg.cuda())
 
             labels = torch.cat((labels_anchor, labels_pos, labels_neg), 0)
-
 
             optimizer.zero_grad()
             embed_anch, embed_pos, embed_neg, predictions  = model(images, images_pos, images_neg)

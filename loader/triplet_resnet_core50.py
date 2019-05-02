@@ -18,44 +18,37 @@ import random
 
 train_scenes = [1,2,4,5,6,8,9,11]
 
-
 known_classes = [ 3,  4,  5,  6,  7,  8,  9, 12, 14, 15, 16, 17, 18, 19, 21, 24, 25,
        26, 27, 29, 30, 32, 34, 35, 36, 37, 40, 41, 42, 45, 46, 47, 48, 49]
 
-novel_classes = [ 1, 2, 10, 11,13,20,22,23,28,31,33,38,39,43,44,50]
-
-all_classes = [1,   2, 3,  4,  5,  6,  7,  8,  9, 10,
-               11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
-               21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
-               31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
-               41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
-
-
-def ordered_glob(rootdir='.', suffix=''):
+def ordered_glob(rootdir='.', instances=''):
     """Performs recursive glob with given suffix and rootdir 
         :param rootdir is the root directory
         :param suffix is the suffix to be searched
     """
     filenames = []
-    filenames_folder = []
 
     folders = glob.glob(rootdir + "/*")
 
-    #print (folders)
-
     for folder in folders:
 
-        if int(folder[-11:-9]) in known_classes:
+        if "scene_01" in folder:
 
-            folder_path = folder + "/*"
+      
+            folder_id = os.path.split(folder)[1][0:6]
 
-            filenames_folder = glob.glob(folder_path)
-            filenames_folder.sort()
-            filenames.extend(filenames_folder)
+            #print(instances)
 
-    #print (filenames)
+            if folder_id in instances:
+
+                folder_path = folder + "/*"
+
+                filenames_folder = glob.glob(folder_path)
+                filenames_folder.sort()
+                filenames.extend(filenames_folder)
 
     return filenames
+
 
 def recursive_glob(rootdir='.', suffix=''):
     """Performs recursive glob with given suffix and rootdir 
@@ -72,7 +65,7 @@ def recursive_glob(rootdir='.', suffix=''):
 def get_different_object(filename):
 
 
-    similar_object_group = known_classes[:] # range(1,51) #[ 3,  4,  5,  6,  7,  8,  9, 12, 14, 15, 16, 17, 18, 19, 21, 24, 25, 26, 27, 29, 30, 32, 34, 35, 36, 37, 40, 41, 42, 45, 46, 47, 48, 49]
+    similar_object_group = known_classes[:]#range(1,51) # [ 3,  4,  5,  6,  7,  8,  9, 12, 14, 15, 16, 17, 18, 19, 21, 24, 25, 26, 27, 29, 30, 32, 34, 35, 36, 37, 40, 41, 42, 45, 46, 47, 48, 49]
 
 #range(1,50)#[1,2,3,4,6,11]
 
@@ -112,24 +105,6 @@ def get_different_view(filename):
     return new_filename
 
 
-def get_nearby_view(filename):
-
-    nby_frame = 10
-
-    vecinity= range(-nby_frame, nby_frame)
-
-    obj_frame = int(filename[-7:-4])
-
-    next_view = random.choice(vecinity)
-
-    next_frame = np.clip( obj_frame - next_view, 10, 299)
-
-    #'/media/mikelf/media_rob/core50_v3/train_full/obj_01_scene_04/C_04_01_236.png'
-
-    new_filename = filename[0:-7] + "%03d" % next_frame  + ".png"
-
-    return new_filename
-
 
 class triplet_resnet_core50(data.Dataset):
 
@@ -138,7 +113,7 @@ class triplet_resnet_core50(data.Dataset):
    
 
     def __init__(self, root, split="train", is_transform=False, 
-                 img_size=(224, 224), augmentations=None):
+                 img_size=(224, 224), augmentations=None, instances=None):
         """__init__
 
         :param root:
@@ -157,12 +132,11 @@ class triplet_resnet_core50(data.Dataset):
         self.mean = np.array([73.15835921, 82.90891754, 72.39239876])
         self.files = {}
 
-
-        os.path.join(self.root, self.split)
-
         self.images_base = os.path.join(self.root, self.split)
 
-        self.files[split] = ordered_glob(rootdir=self.images_base, suffix='.png')
+        self.files[split] = ordered_glob(rootdir=self.images_base,  instances=instances)
+
+        self.instances = instances
 
         if not self.files[split]:
             raise Exception("No files for split=[%s] found in %s" % (split, self.images_base))
@@ -208,6 +182,8 @@ class triplet_resnet_core50(data.Dataset):
         lbl_neg     = np.array([ int(img_path_different[-10:-8]) - 1])
 
 
+        #print(img_nby_path)
+
         img = self.resize_keepRatio(img)
         img_pos = self.resize_keepRatio(img_pos)
         img_neg = self.resize_keepRatio(img_neg)
@@ -220,8 +196,9 @@ class triplet_resnet_core50(data.Dataset):
 
         if self.is_transform:
             img, img_pos, img_neg = self.transform(img, img_pos, img_neg )
+            lbl, lbl_pos, lbl_neg = self.transform_lbl(lbl, lbl_pos, lbl_neg)
 
-        return img, img_pos, img_neg, img_path
+        return img, img_pos, img_neg, img_path#, lbl, lbl_pos, lbl_neg
 
     def resize_keepRatio(self, img):
 
@@ -266,6 +243,7 @@ class triplet_resnet_core50(data.Dataset):
         img_pos = img_pos.transpose(2, 0, 1)
 
 
+
         img_neg = img_neg[:, :, ::-1]
         img_neg = img_neg.astype(np.float64)
         img_neg -= self.mean
@@ -275,6 +253,8 @@ class triplet_resnet_core50(data.Dataset):
         img_neg = img_neg.astype(float) / 255.0
         # NHWC -> NCWH
         img_neg = img_neg.transpose(2, 0, 1)
+
+
 
 
         img = torch.from_numpy(img).float()
@@ -287,6 +267,15 @@ class triplet_resnet_core50(data.Dataset):
         return img, img_pos, img_neg
 
 
+    def transform_lbl(self, lbl, lbl_pos, lbl_neg):
+
+        lbl = torch.from_numpy(lbl).long()
+        lbl_pos = torch.from_numpy(lbl_pos).long()
+        lbl_neg = torch.from_numpy(lbl_neg).long()
+
+        return lbl, lbl_pos, lbl_neg
+
+
 
 
 if __name__ == '__main__':
@@ -294,7 +283,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     local_path = '/media/mikelf/media_rob/core50_v3'
-    dst = triplet_ae_core50_softmax(local_path, split="train", is_transform=True, augmentations=None)
+    dst = triplet_resnet_core50(local_path, split="train", is_transform=True, augmentations=None)
     bs = 2
     trainloader = data.DataLoader(dst, batch_size=bs, num_workers=0, shuffle=True)
     for i, data in enumerate(trainloader):
