@@ -44,7 +44,7 @@ def ordered_glob(rootdir='.', suffix=''):
     filenames = []
     filenames_folder = []
 
-    print rootdir
+    #print rootdir
 
     folders = glob.glob(rootdir + "/*")
     folders_extra = glob.glob(rootdir + "-item/*")

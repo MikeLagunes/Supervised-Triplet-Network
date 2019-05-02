@@ -95,7 +95,7 @@ class Bottleneck(nn.Module):
 
 class Triplet_ResNet_Softmax(nn.Module):
 
-    def __init__(self, block, layers, num_classes=50):
+    def __init__(self, block, layers, num_classes=1000):
         self.inplanes = 64
         super(Triplet_ResNet_Softmax, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
@@ -108,8 +108,9 @@ class Triplet_ResNet_Softmax(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
-        self.fc_embedding = nn.Linear(512 * block.expansion, 128)
+        self.fc = nn.Linear(512 * block.expansion, 1000)
+        self.fc_softmax = nn.Linear(512 * block.expansion, 1000)
+        self.fc_embedding = nn.Linear(512 * block.expansion, 1000)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -148,9 +149,12 @@ class Triplet_ResNet_Softmax(nn.Module):
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
-        
-        x_embedding = self.fc_embedding(x)
-        x_softmax = self.fc(x)
+
+        x = self.fc(x)
+        x = self.relu(x)
+
+        x_softmax = self.fc_softmax(x)
+        x_embedding = self.fc_embedding(x) #self.fc_embedding(x)#
 
         return x_softmax, x_embedding
 
@@ -172,30 +176,19 @@ def triplet_resnet50_softmax(pretrained=False,  num_classes=50, **kwargs):
     """
     model = Triplet_ResNet_Softmax(Bottleneck, [3, 4, 6, 3], num_classes=50, **kwargs)
 
-    weights = model_zoo.load_url(model_urls['resnet50'])
-
-    weights_init = torch.load("/home/alexa/Miguel/MetricLearning_ICRA/train/fc_initial.pkl")['model_state']
-
-    for key, value in weights_init.iteritems():
-
-       if key == "fc.weight": fc_weight = value
-       if key == "fc.bias":  fc_bias = value
-       if key == "fc_embedding.weight": fc_embedding_weight = value
-       if key == "fc_embedding.bias": fc_embedding_bias = value
-
-    weights["fc.weight"]=fc_weight
-    weights["fc.bias"]=fc_bias
-    weights["fc_embedding.weight"]=fc_embedding_weight
-    weights["fc_embedding.bias"]=fc_embedding_bias
-
-    # for key, value in weights.iteritems():
-    #    print key, value
-
+    weights_imagenet = model_zoo.load_url(model_urls['resnet50'])
+    weights_imagenet["fc_embedding.weight"] = weights_imagenet["fc.weight"]
+    weights_imagenet["fc_embedding.bias"] = weights_imagenet["fc.bias"]
+    weights_imagenet["fc_softmax.weight"] = weights_imagenet["fc.weight"]
+    weights_imagenet["fc_softmax.bias"] = weights_imagenet["fc.bias"]
 
     #print (model) 
     if pretrained:
-        model.load_state_dict(weights)
+        model.load_state_dict(weights_imagenet)
 
-    model.fc = nn.Linear(2048, num_classes)
+
+    model.fc = nn.Linear(2048, 1000)
+    model.fc_softmax = nn.Linear(1000, num_classes)
+    model.fc_embedding = nn.Linear(1000, 360)#nn.Linear(num_classes, 128)
 
     return model

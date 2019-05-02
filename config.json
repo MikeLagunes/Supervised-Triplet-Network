@@ -1,24 +1,38 @@
 {
   "tless":
   {
-    "data_path": "/media/alexa/DATA/Datasets/tless/train_only_hard"
+    "data_path": "/media/mikelf/rob/datasets/tless"
   },
-
   "core50":
   {
-    "data_path": "/media/alexa/DATA/Datasets/core50"
+    "data_path": "/media/mikelf/rob/datasets/core50_v3"
   },
-    "mnist":
+  "arc":
   {
-    "data_path": "/media/alexa/DATA/Datasets/mnist"
+    "data_path": "/mnt/storage/home/ml15765/scratch/datasets/arc"
   },
-    "arc":
+  "toybox":
   {
-    "data_path": "/media/alexa/DATA/Datasets/arc"
+    "data_path": "/mnt/storage/home/ml15765/scratch/datasets/toybox"    
   },
-    "toybox":
+  "hinterstoisser":
   {
-    "data_path": "/media/alexa/DATA/Datasets/toybox"
+    "data_path": "/media/mikelf/rob/datasets/6D_obj_rec/hinterstoisser"
+  },
+  "rutgers_apc":
+  {
+    "data_path": "/media/mikelf/rob/datasets/6D_obj_rec/rutgers-apc"
+  },
+  "toyotalight":
+  {
+    "data_path": "/media/mikelf/rob/datasets/6D_obj_rec/toyotalight"
+  },
+  "tudlight":
+  {
+    "data_path": "/media/mikelf/rob/datasets/6D_obj_rec/tudlight"
+  },
+  "tejani":
+  {
+    "data_path": "/media/mikelf/rob/datasets/6D_obj_rec/tejani"
   }
-
 }

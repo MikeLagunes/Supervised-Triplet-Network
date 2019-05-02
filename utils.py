@@ -66,7 +66,7 @@ def show_setup(args, n_classes, optimizer, loss_fn):
 
     print("Model: {} | Training on: {} | Number of Classes: {}".format(args.arch, args.dataset, n_classes))
     print("Epochs: {}".format(args.n_epoch))
-    print("Optimizer: {}").format(optimizer)
+    print("Optimizer: {}".format(optimizer))
     print("Loss function: {}".format(loss_fn))
 
     ID = "Model: {} \n Training on: {} \n Number of Classes: {} \n Epochs: {} \n Optimizer: {} \n Loss function: {} ".format(args.arch, 
@@ -142,13 +142,22 @@ def eval_model(step, sets):
         #print (ckpt_full_path)
         if set_to_test == "full":
             accuracy_all = subprocess.check_output(["python test/nearest_neighbours.py --ckpt_path={} --instances={}".format(ckpt_full_path, set_to_test)], shell=True)
+            accuracy_all = float(accuracy_all.decode('utf-8'))
             accuracies_all.append(accuracy_all)
+            print ("Accuracy full: {} | step: {} ".format(accuracy_all, step))
+
         elif set_to_test == "known":
             accuracy_known = subprocess.check_output(["python test/nearest_neighbours.py --ckpt_path={} --instances={}".format(ckpt_full_path, set_to_test)], shell=True)
-            accuracies_known.append(accuracy_known)  
+            accuracy_known = float(accuracy_known.decode('utf-8'))
+            accuracies_known.append(accuracy_known)
+
+            print ("Accuracy known: {} | step: {} ".format(accuracy_known, step)) 
+             
         elif set_to_test == "novel":
             accuracy_novel = subprocess.check_output(["python test/nearest_neighbours.py --ckpt_path={} --instances={}".format(ckpt_full_path, set_to_test)], shell=True)
+            accuracy_novel = float(accuracy_novel.decode('utf-8'))
             accuracies_novel.append(accuracy_novel) 
+            print ("Accuracy novel: {} | step: {} ".format(accuracy_novel, step))
 
 
     accuracy_step.append(step)
@@ -158,7 +167,4 @@ def eval_model(step, sets):
             accuracies_known=accuracies_known, accuracies_novel=accuracies_novel, ID=ID)
 
 
-    print ("Accuracy: {} | step: {} ".format(accuracy_all, step))
-
     return accuracy_all
-

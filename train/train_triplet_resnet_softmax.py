@@ -43,7 +43,7 @@ def train(args):
 
 
 
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)#, weight_decay=1e-5
+    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=1e-4)#, weight_decay=1e-5
 
     loss_fn = TripletSoftmaxLoss()
     show_setup(args,n_classes, optimizer, loss_fn)
@@ -104,9 +104,9 @@ def train(args):
             
         save_checkpoint(epoch, model, optimizer, "temp")
 
-        if epoch % 4  == 0:
+        if epoch % 2  == 0:
 
-            accuracy_curr = eval_model(step, args.instances_to_eval )
+            accuracy_curr = eval_model(global_step, args.instances_to_eval )
 
             if accuracy_curr > accuracy_best:
                 save_checkpoint(epoch, model, optimizer, "best")
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Hyperparams')
     parser.add_argument('--arch', nargs='?', type=str, default='triplet_cnn_softmax',
                         help='Architecture to use [\'fcn8s, unet, segnet etc\']')
-    parser.add_argument('--dataset', nargs='?', type=str, default='arc',
+    parser.add_argument('--dataset', nargs='?', type=str, default='core50',
                         help='Dataset to use [\'tless, core50, ade20k etc\']')
     parser.add_argument('--img_rows', nargs='?', type=int, default=224, 
                         help='Height of the input image')
@@ -132,7 +132,7 @@ if __name__ == '__main__':
                         help='Test Dataset split to use [\'full, known, novel, all\']')
     parser.add_argument('--n_epoch', nargs='?', type=int, default=500, 
                         help='# of the epochs')
-    parser.add_argument('--batch_size', nargs='?', type=int, default=30,
+    parser.add_argument('--batch_size', nargs='?', type=int, default=10,
                         help='Batch Size')
     parser.add_argument('--l_rate', nargs='?', type=float, default=1e-5,
                         help='Learning Rate')

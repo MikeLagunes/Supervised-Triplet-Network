@@ -45,9 +45,7 @@ def test(args):
         img_size=(args.img_rows, args.img_cols), 
         augmentations=None, 
         instances=instances)
-
-    print("Found {} images for training".format(len(t_loader.files["train"])))
-    
+         
     n_classes = t_loader.n_classes
 
     trainloader = data.DataLoader(t_loader, batch_size=args.batch_size, num_workers=6, shuffle=False)
@@ -55,9 +53,9 @@ def test(args):
     model = embeddings(pretrained=True,  num_classes=n_classes, ckpt_path=args.ckpt_path)
 
     #model.load_state_dict(weights)
-    print ("Model Loaded, Epoch: ", torch.load(args.ckpt_path)['epoch'])
+    #print ("Model Loaded, Epoch: ", torch.load(args.ckpt_path)['epoch'])
 
-    print ("Projecting: " + args.dataset + " | " + args.split + " set")
+    #print ("Projecting: " + args.dataset + " | " + args.split + " set")
     #print(root_dir + args.split + "_" + os.path.split(args.ckpt_path)[1][:-4] + "_" + args.instances)
 
     
@@ -65,7 +63,7 @@ def test(args):
     model.eval()
 
     output_embedding = np.array([])
-    outputs_embedding = np.zeros((1,128))#128
+    outputs_embedding = np.zeros((1,360))#128
     labels_embedding = np.zeros((1))
     path_imgs = []
     total =0
@@ -88,7 +86,7 @@ def test(args):
     #print(root_dir + args.split + "_" + os.path.split(args.ckpt_path)[1][:-4] + "_" + args.instances)
     np.savez(root_dir + args.split + "_" + os.path.split(args.ckpt_path)[1][:-4] + "_" + args.instances ,  embeddings=outputs_embedding, lebels=labels_embedding, filenames=path_imgs)
    
-    print ('Done: ')
+    #print ('Done: ')
 
 
     

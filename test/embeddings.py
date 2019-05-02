@@ -108,8 +108,9 @@ class resnet50_embeddings(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)#(512 * block.expansion, num_classes)
-        self.fc_embedding = nn.Linear(512 * block.expansion, 128)
+        self.fc = nn.Linear(512 * block.expansion, 1000)
+        self.fc_softmax = nn.Linear(1000, num_classes)
+        self.fc_embedding = nn.Linear(1000, 360)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -148,8 +149,15 @@ class resnet50_embeddings(nn.Module):
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
-        #x_softmax = self.fc(x)
+
+        x = self.fc(x)
+        x = self.relu(x)
+
+        x_softmax = self.fc_softmax(x)
         x_embedding = self.fc_embedding(x)
+
+        #x_softmax = self.fc(x)
+        #x_embedding = self.fc_embedding(x)
 
         return x_embedding
 
@@ -168,6 +176,5 @@ def embeddings(pretrained=False,  num_classes=50, ckpt_path=False, **kwargs):
     if pretrained:
         model.load_state_dict(weights_init)
 
-    #model.fc = nn.Linear(2048, num_classes)
 
     return model
