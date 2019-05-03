@@ -31,21 +31,18 @@ def ordered_glob(rootdir='.', instances=''):
     folders = glob.glob(rootdir + "/*")
 
     for folder in folders:
+        
+        folder_id = os.path.split(folder)[1][0:6]
 
-        if "scene_01" in folder:
+        #print(instances)
 
-      
-            folder_id = os.path.split(folder)[1][0:6]
+        if folder_id in instances:
 
-            #print(instances)
+            folder_path = folder + "/*"
 
-            if folder_id in instances:
-
-                folder_path = folder + "/*"
-
-                filenames_folder = glob.glob(folder_path)
-                filenames_folder.sort()
-                filenames.extend(filenames_folder)
+            filenames_folder = glob.glob(folder_path)
+            filenames_folder.sort()
+            filenames.extend(filenames_folder)
 
     return filenames
 
