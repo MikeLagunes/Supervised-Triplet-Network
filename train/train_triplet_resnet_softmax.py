@@ -37,12 +37,13 @@ def train(args):
     trainloader = data.DataLoader(t_loader, batch_size=args.batch_size, num_workers=6, shuffle=True)
     
     # Setup Model
-    model = triplet_resnet50_softmax(pretrained=True,  num_classes=n_classes)
+    model = triplet_resnet50_softmax(pretrained=True,  num_classes=n_classes, embedding_size=args.embedding_size)
     model.cuda()
 
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=1e-4)#, weight_decay=1e-5
 
-    loss_fn = TripletSoftmaxLoss()
+    loss_fn = TripletSoftmaxLoss(lambda_factor=0.01)
+    
     show_setup(args,n_classes, optimizer, loss_fn)
 
     # Training from Checkpoint
@@ -115,7 +116,9 @@ if __name__ == '__main__':
     parser.add_argument('--arch', nargs='?', type=str, default='triplet_cnn_softmax',
                         help='Architecture to use [\'fcn8s, unet, segnet etc\']')
     parser.add_argument('--dataset', nargs='?', type=str, default='core50',
-                        help='Dataset to use [\'tless, core50, ade20k etc\']')
+                        help='Dataset to use [\'tless, core50, toybox etc\']')
+    parser.add_argument('--embedding_size', nargs='?', type=int, default=128, 
+                        help='dense layer size for inference')
     parser.add_argument('--img_rows', nargs='?', type=int, default=224, 
                         help='Height of the input image')
     parser.add_argument('--img_cols', nargs='?', type=int, default=224, 
@@ -132,8 +135,6 @@ if __name__ == '__main__':
                         help='Batch Size')
     parser.add_argument('--l_rate', nargs='?', type=float, default=1e-5,
                         help='Learning Rate')
-    parser.add_argument('--feature_scale', nargs='?', type=int, default=1, 
-                        help='Divider for # of features to use')
     parser.add_argument('--ckpt_path', nargs='?', type=str, default='.',
                     help='Path to save checkpoints')
     parser.add_argument('--eval_freq', nargs='?', type=int, default=1,

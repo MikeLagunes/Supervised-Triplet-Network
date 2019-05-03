@@ -43,11 +43,11 @@ class TripletSoftmaxLoss(nn.Module):
     Takes embeddings of an anchor sample, a positive sample, a negative sample, logits and class labels
     """
 
-    def __init__(self, margin=0.0, size_average=True, lambda_factor=0.001 ):
+    def __init__(self, margin=0.0, size_average=True, lambda_factor=0.0 ):
         super(TripletSoftmaxLoss, self).__init__()
         self.margin = margin
         self.loss_fn = nn.CrossEntropyLoss()
-        self.lambda_factor = 0.01
+        self.lambda_factor = lambda_factor
                     
     def forward(self, anchor, positive, negative, outputs, labels ):
         distance_positive = torch.abs(anchor - positive).sum(1)  # .pow(.5)

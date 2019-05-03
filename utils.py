@@ -65,9 +65,11 @@ def show_setup(args, n_classes, optimizer, loss_fn):
     args_local=args
 
     print("Model: {} | Training on: {} | Number of Classes: {}".format(args.arch, args.dataset, n_classes))
+    print("Embedding size: {}".format(args.embedding_size))
     print("Epochs: {}".format(args.n_epoch))
     print("Optimizer: {}".format(optimizer))
     print("Loss function: {}".format(loss_fn))
+
 
     ID = "Model: {} \n Training on: {} \n Number of Classes: {} \n Epochs: {} \n Optimizer: {} \n Loss function: {} ".format(args.arch, 
         args.dataset, n_classes,args.n_epoch, optimizer, loss_fn)
@@ -136,8 +138,8 @@ def eval_model(step, sets):
 
     for set_to_test in sets_to_test:
 
-        subprocess.call(["python test/test_embeddings.py --ckpt_path={} --dataset={} --instances={} --split=test".format(ckpt_full_path,  args_local.dataset, set_to_test)], shell=True)
-        subprocess.call(["python test/test_embeddings.py --ckpt_path={} --dataset={} --instances={} --split=train".format(ckpt_full_path,  args_local.dataset, set_to_test)], shell=True)
+        subprocess.call(["python test/test_embeddings.py --ckpt_path={} --dataset={} --instances={} --split=test --embedding_size={}".format(ckpt_full_path,  args_local.dataset, set_to_test, args_local.embedding_size)], shell=True)
+        subprocess.call(["python test/test_embeddings.py --ckpt_path={} --dataset={} --instances={} --split=train --embedding_size={}".format(ckpt_full_path,  args_local.dataset, set_to_test, args_local.embedding_size)], shell=True)
         
         #print (ckpt_full_path)
         if set_to_test == "full":

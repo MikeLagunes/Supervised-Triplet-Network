@@ -51,20 +51,13 @@ def test(args):
 
     trainloader = data.DataLoader(t_loader, batch_size=args.batch_size, num_workers=6, shuffle=False)
 
-    model = embeddings(pretrained=True,  num_classes=n_classes, ckpt_path=args.ckpt_path)
-
-    #model.load_state_dict(weights)
-    #print ("Model Loaded, Epoch: ", torch.load(args.ckpt_path)['epoch'])
-
-    #print ("Projecting: " + args.dataset + " | " + args.split + " set")
-    #print(root_dir + args.split + "_" + os.path.split(args.ckpt_path)[1][:-4] + "_" + args.instances)
-
+    model = embeddings(pretrained=True,  num_classes=n_classes, ckpt_path=args.ckpt_path, embedding_size=args.embedding_size)
     
     model = model.cuda()
     model.eval()
 
     output_embedding = np.array([])
-    outputs_embedding = np.zeros((1,360))#128
+    outputs_embedding = np.zeros((1,args.embedding_size))#128
     labels_embedding = np.zeros((1))
     path_imgs = []
     total =0
@@ -111,6 +104,8 @@ if __name__ == '__main__':
                         help='Height of the input image')
     parser.add_argument('--batch_size', nargs='?', type=int, default=5, #7 
                         help='Batch Size')
+    parser.add_argument('--embedding_size', nargs='?', type=int, default=128, #7 
+                        help='Size of the dense layer for inference')
     parser.add_argument('--split', nargs='?', type=str, default='test', 
                         help='Dataset split to use [\'train, eval\']')
 
