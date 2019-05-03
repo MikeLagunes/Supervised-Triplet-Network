@@ -43,7 +43,7 @@ def train(args):
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=1e-4)#, weight_decay=1e-5
 
     loss_fn = TripletSoftmaxLoss(lambda_factor=0.01)
-    
+
     show_setup(args,n_classes, optimizer, loss_fn)
 
     # Training from Checkpoint
@@ -108,8 +108,6 @@ def train(args):
             if accuracy_curr > accuracy_best:
                 save_checkpoint(epoch, model, optimizer, "best")
                 accuracy_best = accuracy_curr
-
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Hyperparams')
